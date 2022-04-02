@@ -1,0 +1,67 @@
+---
+title: "Data Sourcing"
+author: "Sam Pastoriza, Haley Roberts, Hyukzoo Shin, Harrison Lee"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  bookdown::html_document2:
+    self_contained: yes
+    toc: yes
+    number_sections: yes
+  pdf_document:
+    toc: yes
+    keep_tex: yes
+  word_document:
+    toc: yes
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{tabulary}
+  - \usepackage{multirow}
+  - \usepackage{xcolor}
+  - \usepackage{wrapfig}
+  - \usepackage{float}
+  - \usepackage{colortbl}
+  - \usepackage{pdflscape}
+  - \usepackage{tabu}
+  - \usepackage{threeparttable}
+---
+
+# Support Packages
+
+```{r support, echo=FALSE,warning=FALSE,message=FALSE}
+set.seed(114)
+require(MASS)
+require(glmnet)
+library(kableExtra)
+library(stargazer)
+library(flextable)
+library(dplyr)
+library(leaps)
+library(caret)
+library(ggplot2)
+library(ggExtra)
+library(tidyr)
+library(ISLR2)
+library(ISLR)
+library(readr)
+library(reticulate)
+library(tidyverse)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load("weights", "interactions", "cjoint", "plm", "interactions", "jtools", "stats", "miceadds", "broom", "RColorBrewer", "ggstatsplot", "ggpubr", "stargazer", "sandwich", "hrbrthemes", "rms", "interplot", "coefplot", "gmodels", "car", "lattice", "foreign", "ggplot2", "MASS", "Hmisc", "reshape2", "oddsratio", "tidyr", "psych", "dplyr", "tidyverse", "cjoint")
+
+knitr::opts_chunk$set(tidy.opts = list(width.cutoff = 60), tidy = TRUE, echo = TRUE)
+
+def.chunk.hook <- knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  ifelse(options$size != "normalsize", paste0("\n \\", options$size, "\n\n", x, "\n\n \\normalsize"), x)
+})
+```
+
+# Data Sourcing
+```{r}
+training.df <- read.csv('./data/train_values.csv')
+head(training.df)
+tail(training.df)
+str(training.df)
+```
