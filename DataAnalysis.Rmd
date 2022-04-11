@@ -45,6 +45,12 @@ library(ISLR2)
 library(ISLR)
 library(readr)
 library(reticulate)
+library(randomForest) #for random forests
+library(caret) # for CV folds and data splitting
+library(ROCR) # for diagnostics and ROC plots/stats
+library(pROC) # same as ROCR
+library(stepPlr) # Firth;s logit implemented thru caret library
+library(doParallel) # for using multiple processor cores
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load("weights", "interactions", "cjoint", "plm", "interactions", "jtools", "stats", "miceadds", "broom", "RColorBrewer", "ggstatsplot", "ggpubr", "stargazer", "sandwich", "hrbrthemes", "rms", "interplot", "coefplot", "gmodels", "car", "lattice","foreign", "ggplot2", "MASS", "Hmisc", "reshape2", "oddsratio", "tidyr", "psych", "dplyr", "tidyverse", "cjoint")
 
@@ -57,7 +63,84 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 })
 ```
 
-# Data Sourcing
+# Load the data
+```{r}
+cleaned.data.df <- read.csv('./cleaned_data/cleaned_training_data.csv') %>%
+  mutate(
+    damage_grade = as.factor(damage_grade),
+    land_surface_condition = as.factor(land_surface_condition),
+    foundation_type = as.factor(foundation_type),
+    roof_type = as.factor(roof_type),
+    ground_floor_type = as.factor(ground_floor_type),
+    other_floor_type = as.factor(other_floor_type),
+    position = as.factor(position),
+    plan_configuration = as.factor(plan_configuration),
+    legal_ownership_status = as.factor(legal_ownership_status),
+    has_secondary_use = as.factor(has_secondary_use),
+    has_secondary_use_agriculture = as.factor(has_secondary_use_agriculture),
+    has_secondary_use_hotel = as.factor(has_secondary_use_hotel),
+    has_secondary_use_rental = as.factor(has_secondary_use_rental),
+    has_secondary_use_institution = as.factor(has_secondary_use_institution),
+    has_secondary_use_school = as.factor(has_secondary_use_school),
+    has_secondary_use_industry = as.factor(has_secondary_use_industry),
+    has_secondary_use_health_post = as.factor(has_secondary_use_health_post),
+    has_secondary_use_gov_office = as.factor(has_secondary_use_gov_office),
+    has_secondary_use_use_police = as.factor(has_secondary_use_use_police),
+    has_secondary_use_other = as.factor(has_secondary_use_other),
+    has_superstructure_adobe_mud = as.factor(has_superstructure_adobe_mud),
+    has_superstructure_mud_mortar_stone = as.factor(has_superstructure_mud_mortar_stone),
+    has_superstructure_stone_flag = as.factor(has_superstructure_stone_flag),
+    has_superstructure_cement_mortar_stone = as.factor(has_superstructure_cement_mortar_stone),
+    has_superstructure_mud_mortar_brick = as.factor(has_superstructure_mud_mortar_brick),
+    has_superstructure_cement_mortar_brick = as.factor(has_superstructure_cement_mortar_brick),
+    has_superstructure_timber = as.factor(has_superstructure_timber),
+    has_superstructure_bamboo = as.factor(has_superstructure_bamboo),
+    has_superstructure_rc_non_engineered = as.factor(has_superstructure_rc_non_engineered),
+    has_superstructure_rc_engineered = as.factor(has_superstructure_rc_engineered),
+    has_superstructure_other = as.factor(has_superstructure_other)
+  )
+
+head(cleaned.data.df)
+str(cleaned.data.df)
+
+registerDoParallel(cores = 5)
+```
+
+# Logistic Regression
+
 ```{r}
 
 ```
+
+# Naive Bayes
+
+```{r}
+
+```
+
+# Decision Trees
+
+```{r}
+
+```
+
+# Random Forests
+
+```{r}
+
+```
+
+# Bagging
+
+```{r}
+
+```
+
+# Boosting
+
+```{r}
+
+```
+
+
+

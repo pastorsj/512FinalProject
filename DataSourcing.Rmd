@@ -245,7 +245,7 @@ GGally::ggpairs(training.df[,17:26],
 # Save the training data
 
 ```{r}
-write.csv(training.df, './cleaned_data/cleaned_training_data.csv')
+write.csv(training.df, './cleaned_data/cleaned_training_data.csv', row.names = FALSE)
 ```
 
 # Outlier Checking
