@@ -247,3 +247,10 @@ GGally::ggpairs(training.df[,17:26],
 ```{r}
 write.csv(training.df, './cleaned_data/cleaned_training_data.csv')
 ```
+
+# Outlier Checking
+
+What is going on with the Age? 995 for age?
+```{r}
+table(training.df$age)
+```
