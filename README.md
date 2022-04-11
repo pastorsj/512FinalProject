@@ -49,6 +49,6 @@ There are 39 columns in this dataset, where the building_id column is a unique a
 - **has_secondary_use_school** (type: binary): flag variable that indicates if the building was used as a school.
 - **has_secondary_use_industry** (type: binary): flag variable that indicates if the building was used for industrial purposes.
 - **has_secondary_use_health_post** (type: binary): flag variable that indicates if the building was used as a health post.
-- **has_secondary_use_gov_office** (type: binary): flag variable that indicates if the building was used fas a government office.
+- **has_secondary_use_gov_office** (type: binary): flag variable that indicates if the building was used as a government office.
 - **has_secondary_use_use_police** (type: binary): flag variable that indicates if the building was used as a police station.
 - **has_secondary_use_other** (type: binary): flag variable that indicates if the building was secondarily used for other purposes.

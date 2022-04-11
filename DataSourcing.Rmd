@@ -47,7 +47,7 @@ library(readr)
 library(reticulate)
 library(tidyverse)
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load("weights", "interactions", "cjoint", "plm", "interactions", "jtools", "stats", "miceadds", "broom", "RColorBrewer", "ggstatsplot", "ggpubr", "stargazer", "sandwich", "hrbrthemes", "rms", "interplot", "coefplot", "gmodels", "car", "lattice", "foreign", "ggplot2", "MASS", "Hmisc", "reshape2", "oddsratio", "tidyr", "psych", "dplyr", "tidyverse", "cjoint")
+pacman::p_load("weights", "interactions", "cjoint", "plm", "interactions", "jtools", "stats", "miceadds", "broom", "RColorBrewer", "ggstatsplot", "ggpubr", "stargazer", "sandwich", "hrbrthemes", "rms", "interplot", "coefplot", "gmodels", "car", "lattice", "foreign", "ggplot2", "MASS", "Hmisc", "reshape2", "oddsratio", "tidyr", "psych", "dplyr", "tidyverse", "cjoint", "naniar")
 
 knitr::opts_chunk$set(tidy.opts = list(width.cutoff = 60), tidy = TRUE, echo = TRUE)
 
@@ -59,9 +59,191 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 ```
 
 # Data Sourcing
+
+## Load the training values
 ```{r}
-training.df <- read.csv('./data/train_values.csv')
-head(training.df)
-tail(training.df)
+training.values.df <- read.csv('./data/train_values.csv')
+head(training.values.df)
+tail(training.values.df)
+str(training.values.df)
+```
+
+## Load the training labels
+
+```{r}
+training.labels.df <- read.csv('./data/train_labels.csv')
+head(training.labels.df)
+tail(training.labels.df)
+str(training.labels.df)
+```
+
+# Merge the training data with the labels
+
+```{r}
+training.df <- training.values.df %>%
+  left_join(training.labels.df, by = "building_id") %>%
+  mutate(
+    damage_grade = factor(damage_grade, levels = c(1, 2, 3), labels = c("Low", "Medium", "High")),
+    land_surface_condition = as.factor(land_surface_condition),
+    foundation_type = as.factor(foundation_type),
+    roof_type = as.factor(roof_type),
+    ground_floor_type = as.factor(ground_floor_type),
+    other_floor_type = as.factor(other_floor_type),
+    position = as.factor(position),
+    plan_configuration = as.factor(plan_configuration),
+    legal_ownership_status = as.factor(legal_ownership_status),
+    has_secondary_use = as.factor(has_secondary_use),
+    has_secondary_use_agriculture = as.factor(has_secondary_use_agriculture),
+    has_secondary_use_hotel = as.factor(has_secondary_use_hotel),
+    has_secondary_use_rental = as.factor(has_secondary_use_rental),
+    has_secondary_use_institution = as.factor(has_secondary_use_institution),
+    has_secondary_use_school = as.factor(has_secondary_use_school),
+    has_secondary_use_industry = as.factor(has_secondary_use_industry),
+    has_secondary_use_health_post = as.factor(has_secondary_use_health_post),
+    has_secondary_use_gov_office = as.factor(has_secondary_use_gov_office),
+    has_secondary_use_use_police = as.factor(has_secondary_use_use_police),
+    has_secondary_use_other = as.factor(has_secondary_use_other),
+    has_superstructure_adobe_mud = as.factor(has_superstructure_adobe_mud),
+    has_superstructure_mud_mortar_stone = as.factor(has_superstructure_mud_mortar_stone),
+    has_superstructure_stone_flag = as.factor(has_superstructure_stone_flag),
+    has_superstructure_cement_mortar_stone = as.factor(has_superstructure_cement_mortar_stone),
+    has_superstructure_mud_mortar_brick = as.factor(has_superstructure_mud_mortar_brick),
+    has_superstructure_cement_mortar_brick = as.factor(has_superstructure_cement_mortar_brick),
+    has_superstructure_timber = as.factor(has_superstructure_timber),
+    has_superstructure_bamboo = as.factor(has_superstructure_bamboo),
+    has_superstructure_rc_non_engineered = as.factor(has_superstructure_rc_non_engineered),
+    has_superstructure_rc_engineered = as.factor(has_superstructure_rc_engineered),
+    has_superstructure_other = as.factor(has_superstructure_other)
+  )
+
 str(training.df)
+head(training.df)
+```
+
+# Initial Data Exploration
+
+Using a simple missing values chart, we can see how many values are actually missing from the initial dataset.
+
+```{r}
+gg_miss_var(training.df %>% mutate_all(na_if, ""), show_pct = TRUE) +
+  ggtitle('Missing Values Plot')
+ggsave("./visualizations/missing_variables_plot.svg", width = 10, height = 8, units = "in")
+```
+
+Given the missing values chart above, there are no missing values across all of the variables.
+
+# Learn more about categorical variable distributions
+
+Plot distributions of categorical variables
+
+```{r fig.height=8, fig.width=10}
+training.df %>%
+  select(land_surface_condition, 
+         foundation_type, 
+         roof_type, 
+         ground_floor_type, 
+         other_floor_type, 
+         position, 
+         plan_configuration, 
+         legal_ownership_status) %>%
+  pivot_longer(names_to = 'Category', values_to = 'Value', cols = everything()) %>% 
+  ggplot(aes(x = Value)) + 
+  geom_bar(stat = 'count') + 
+  facet_wrap(~Category, scales = 'free')
+ggsave("./visualizations/categorical_variables_distribution.svg", width = 10, height = 8, units = "in")
+```
+
+### Numerical Distribution
+
+```{r fig.height=8, fig.width=10}
+training.df %>%
+  select(where(is.numeric)) %>%
+  select(-building_id) %>%
+  pivot_longer(names_to = "Variable", values_to = "value", cols = everything()) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram() +
+  facet_wrap(~Variable, scales = "free")
+ggsave("./visualizations/numerical_variables_distribution.svg", width = 10, height = 8, units = "in")
+```
+
+### Superstructure information
+
+```{r fig.height=8, fig.width=10}
+training.df %>%
+  select(has_superstructure_adobe_mud, 
+         has_superstructure_mud_mortar_stone, 
+         has_superstructure_stone_flag, 
+         has_superstructure_cement_mortar_stone, 
+         has_superstructure_mud_mortar_brick, 
+         has_superstructure_cement_mortar_brick, 
+         has_superstructure_timber, 
+         has_superstructure_bamboo, 
+         has_superstructure_rc_non_engineered, 
+         has_superstructure_rc_engineered,
+         has_superstructure_other) %>%
+  pivot_longer(names_to = "Category", values_to = "Value", cols = everything()) %>%
+  ggplot(aes(x = Value, fill = Value)) +
+  geom_bar(stat = "count") +
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1, nudge_y = -.5) +
+  facet_wrap(~Category, scales = "free")
+ggsave("./visualizations/superstructure_variables_distribution.svg", width = 14, height = 8, units = "in")
+```
+
+
+### Secondary information
+
+```{r fig.height=8, fig.width=10}
+training.df %>%
+  select(
+    has_secondary_use,
+    has_secondary_use_agriculture,
+    has_secondary_use_hotel,
+    has_secondary_use_rental,
+    has_secondary_use_institution,
+    has_secondary_use_school,
+    has_secondary_use_industry,
+    has_secondary_use_health_post,
+    has_secondary_use_gov_office,
+    has_secondary_use_use_police,
+    has_secondary_use_other
+  ) %>%
+  pivot_longer(names_to = "Category", values_to = "Value", cols = everything()) %>%
+  ggplot(aes(x = Value, fill = Value)) +
+  geom_bar(stat = "count") +
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1, nudge_y = -.5) +
+  facet_wrap(~Category, scales = "free")
+ggsave("./visualizations/secondary_variables_distribution.svg", width = 12, height = 8, units = "in")
+```
+
+Plot damage grade label information
+
+```{r}
+training.df %>%
+  ggplot(aes(x = damage_grade, fill = damage_grade)) +
+  geom_bar() + 
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, nudge_y = -.5) +
+  guides(color = guide_legend('Damage Grade')) + 
+  labs(x = 'Damage Grade Labels', y = 'Count', title = 'Distribution of Damage Grade Labels')
+ggsave("./visualizations/labels_distribution.svg", width = 10, height = 8, units = "in")
+```
+
+## Plot Correlation Matrices
+
+```{r fig.height=8, fig.width=10}
+GGally::ggpairs(training.df[,2:6], 
+                aes(color = training.df$damage_grade, alpha = 0.5), 
+                title = 'Correlogram of Data') 
+```
+
+
+```{r fig.height=8, fig.width=10}
+GGally::ggpairs(training.df[,17:26], 
+                aes(color = training.df$damage_grade, alpha = 0.5), 
+                title = 'Correlogram of Superstructure Data') 
+```
+
+# Save the training data
+
+```{r}
+write.csv(training.df, './cleaned_data/cleaned_training_data.csv')
 ```
