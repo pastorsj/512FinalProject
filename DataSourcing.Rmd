@@ -253,91 +253,175 @@ write.csv(training.df, './cleaned_data/cleaned_training_data.csv', row.names = F
 ## Land Surface Condition
 
 ```{r}
-land.heatmap.df <- as.data.frame(table(training.df$land_surface_condition, training.df$damage_grade))
+land.heatmap.df <- as.data.frame(table(training.df$land_surface_condition, training.df$damage_grade)) %>%
+  group_by(Var1) %>%
+  mutate(TotalInVar = sum(Freq)) %>%
+  ungroup() %>%
+  mutate(NormalizedFreq = round((Freq / TotalInVar) * 100, digits = 2)) %>%
+  mutate(NormalizedFreq = as.numeric(as.character(NormalizedFreq)))
+
+ggplot(land.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = NormalizedFreq)) + 
+    geom_text(aes(label = paste0(NormalizedFreq, '%'))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Land Surface Condition", y = "Damage Type", title = "Land Surface Condition Heatmap -- Normalized")
+ggsave("./visualizations/land_surface_condition_normalized_heatmap.svg", width = 10, height = 8, units = "in")
 
 ggplot(land.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Land Surface Condition", y = "Damage Type")
+    labs(x = "Land Surface Condition", y = "Damage Type", title = "Land Surface Condition Heatmap -- Not Normalized")
 ggsave("./visualizations/land_surface_condition_heatmap.svg", width = 10, height = 8, units = "in")
 ```
 
 ## Foundation Type
 
 ```{r}
-foundation.heatmap.df <- as.data.frame(table(training.df$foundation_type, training.df$damage_grade))
+foundation.heatmap.df <- as.data.frame(table(training.df$foundation_type, training.df$damage_grade)) %>%
+  group_by(Var1) %>%
+  mutate(TotalInVar = sum(Freq)) %>%
+  ungroup() %>%
+  mutate(NormalizedFreq = round((Freq / TotalInVar) * 100, digits = 2)) %>%
+  mutate(NormalizedFreq = as.numeric(as.character(NormalizedFreq)))
+
+ggplot(foundation.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = NormalizedFreq)) + 
+    geom_text(aes(label = paste0(NormalizedFreq, '%'))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Foundation Type", y = "Damage Type", title = "Foundation Type Heatmap -- Normalized")
+ggsave("./visualizations/foundation_type_normalized_heatmap.svg", width = 10, height = 8, units = "in")
 
 ggplot(foundation.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Foundation Type", y = "Damage Type")
+    labs(x = "Foundation Type", y = "Damage Type", title = "Foundation Type Heatmap -- Not Normalized")
 ggsave("./visualizations/foundation_type_heatmap.svg", width = 10, height = 8, units = "in")
 ```
 
 ## Roof Type
 
 ```{r}
-roof.heatmap.df <- as.data.frame(table(training.df$roof_type, training.df$damage_grade))
+roof.heatmap.df <- as.data.frame(table(training.df$roof_type, training.df$damage_grade)) %>%
+  group_by(Var1) %>%
+  mutate(TotalInVar = sum(Freq)) %>%
+  ungroup() %>%
+  mutate(NormalizedFreq = round((Freq / TotalInVar) * 100, digits = 2)) %>%
+  mutate(NormalizedFreq = as.numeric(as.character(NormalizedFreq)))
+
+ggplot(roof.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = NormalizedFreq)) + 
+    geom_text(aes(label = paste0(NormalizedFreq, "%"))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Roof Type", y = "Damage Type", title = "Roof Type Heatmap -- Normalized")
+ggsave("./visualizations/roof_type_normalized_heatmap.svg", width = 10, height = 8, units = "in")
 
 ggplot(roof.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Roof Type", y = "Damage Type")
+    labs(x = "Roof Type", y = "Damage Type", title = "Roof Type Heatmap -- Not Normalized")
 ggsave("./visualizations/roof_type_heatmap.svg", width = 10, height = 8, units = "in")
 ```
 
 ## Ground Floor Type
 
 ```{r}
-ground.heatmap.df <- as.data.frame(table(training.df$ground_floor_type, training.df$damage_grade))
+ground.heatmap.df <- as.data.frame(table(training.df$ground_floor_type, training.df$damage_grade)) %>%
+  group_by(Var1) %>%
+  mutate(TotalInVar = sum(Freq)) %>%
+  ungroup() %>%
+  mutate(NormalizedFreq = round((Freq / TotalInVar) * 100, digits = 2)) %>%
+  mutate(NormalizedFreq = as.numeric(as.character(NormalizedFreq)))
+
+ggplot(ground.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = NormalizedFreq)) + 
+    geom_text(aes(label = paste0(NormalizedFreq, "%"))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Ground Type", y = "Damage Type", title = "Ground Floor Type Heatmap -- Normalized")
+ggsave("./visualizations/ground_floor_type_normalized_heatmap.svg", width = 10, height = 8, units = "in")
 
 ggplot(ground.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Ground Type", y = "Damage Type")
+    labs(x = "Ground Type", y = "Damage Type", title = "Ground Floor Type Heatmap -- Not Normalized")
 ggsave("./visualizations/ground_floor_type_heatmap.svg", width = 10, height = 8, units = "in")
 ```
 
 ## Other Floor Type
 
 ```{r}
-other.heatmap.df <- as.data.frame(table(training.df$other_floor_type, training.df$damage_grade))
+other.heatmap.df <- as.data.frame(table(training.df$other_floor_type, training.df$damage_grade)) %>%
+  group_by(Var1) %>%
+  mutate(TotalInVar = sum(Freq)) %>%
+  ungroup() %>%
+  mutate(NormalizedFreq = round((Freq / TotalInVar) * 100, digits = 2)) %>%
+  mutate(NormalizedFreq = as.numeric(as.character(NormalizedFreq)))
+
+ggplot(other.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = NormalizedFreq)) + 
+    geom_text(aes(label = paste0(NormalizedFreq, "%"))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Other Floor Type", y = "Damage Type", title = "Other Floor Type Heatmap -- Normalized")
+ggsave("./visualizations/other_floor_type_normalized_heatmap.svg", width = 10, height = 8, units = "in")
 
 ggplot(other.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Other Type", y = "Damage Type")
+    labs(x = "Other Floor Type", y = "Damage Type", title = "Other Floor Type Heatmap -- Not Normalized")
 ggsave("./visualizations/other_floor_type_heatmap.svg", width = 10, height = 8, units = "in")
 ```
 
 ## Plan Configuration
 
 ```{r}
-plan.heatmap.df <- as.data.frame(table(training.df$plan_configuration, training.df$damage_grade))
+plan.heatmap.df <- as.data.frame(table(training.df$plan_configuration, training.df$damage_grade)) %>%
+  group_by(Var1) %>%
+  mutate(TotalInVar = sum(Freq)) %>%
+  ungroup() %>%
+  mutate(NormalizedFreq = round((Freq / TotalInVar) * 100, digits = 2)) %>%
+  mutate(NormalizedFreq = as.numeric(as.character(NormalizedFreq)))
+
+ggplot(plan.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = NormalizedFreq)) + 
+    geom_text(aes(label = paste0(NormalizedFreq, "%"))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Plan Configuration", y = "Damage Type", title = "Plan Configuration Heatmap -- Normalized")
+ggsave("./visualizations/plan_configuration_normalized_heatmap.svg", width = 12, height = 8, units = "in")
 
 ggplot(plan.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Plan Configuration", y = "Damage Type")
+    labs(x = "Plan Configuration", y = "Damage Type", title = "Plan Configuration Heatmap -- Not Normalized")
 ggsave("./visualizations/plan_configuration_heatmap.svg", width = 10, height = 8, units = "in")
 ```
 
 ## Legal Ownership Status
 
 ```{r}
-legal.heatmap.df <- as.data.frame(table(training.df$legal_ownership_status, training.df$damage_grade))
+legal.heatmap.df <- as.data.frame(table(training.df$legal_ownership_status, training.df$damage_grade)) %>%
+  group_by(Var1) %>%
+  mutate(TotalInVar = sum(Freq)) %>%
+  ungroup() %>%
+  mutate(NormalizedFreq = round((Freq / TotalInVar) * 100, digits = 2)) %>%
+  mutate(NormalizedFreq = as.numeric(as.character(NormalizedFreq)))
+
+ggplot(legal.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = NormalizedFreq)) + 
+    geom_text(aes(label = paste0(NormalizedFreq, "%"))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Legal Ownership Status", y = "Damage Type", title = "Legal Ownership Status Heatmap -- Normalized")
+ggsave("./visualizations/legal_ownership_status_normalized_heatmap.svg", width = 10, height = 8, units = "in")
 
 ggplot(legal.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Legal Ownership Status", y = "Damage Type")
+    labs(x = "Legal Ownership Status", y = "Damage Type", title = "Legal Ownership Status Heatmap -- Not Normalized")
 ggsave("./visualizations/legal_ownership_status_heatmap.svg", width = 10, height = 8, units = "in")
 ```
 
@@ -347,12 +431,23 @@ What is going on with the Age? 995 for age?
 ```{r}
 table(training.df$age)
 
-age.heatmap.df <- as.data.frame(table(training.df$age, training.df$damage_grade))
+age.heatmap.df <- as.data.frame(table(training.df$age, training.df$damage_grade)) %>%
+  group_by(Var1) %>%
+  mutate(TotalInVar = sum(Freq)) %>%
+  ungroup() %>%
+  mutate(NormalizedFreq = round((Freq / TotalInVar) * 100, digits = 2)) %>%
+  mutate(NormalizedFreq = as.numeric(as.character(NormalizedFreq)))
+
+ggplot(age.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = NormalizedFreq)) + 
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Age", y = "Damage Type", title = "Age Heatmap -- Normalized")
+ggsave("./visualizations/age_normalized_heatmap.svg", width = 16, height = 6, units = "in")
 
 ggplot(age.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Age", y = "Damage Type")
+    labs(x = "Age", y = "Damage Type", title = "Age Heatmap -- Not Normalized")
 ggsave("./visualizations/age_heatmap.svg", width = 16, height = 6, units = "in")
 ```
 
@@ -379,6 +474,30 @@ secondary.df <- training.df %>%
 
 table(secondary.df$secondary_use)
 table(secondary.df$secondary_use, secondary.df$damage_grade)
+
+secondary.heatmap.df <- as.data.frame(table(secondary.df$secondary_use, secondary.df$damage_grade)) %>%
+  filter(Var1 != 'none') %>%
+  group_by(Var1) %>%
+  mutate(TotalInVar = sum(Freq)) %>%
+  ungroup() %>%
+  mutate(NormalizedFreq = round((Freq / TotalInVar) * 100, digits = 2)) %>%
+  mutate(NormalizedFreq = as.numeric(as.character(NormalizedFreq)))
+
+ggplot(secondary.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = NormalizedFreq)) + 
+    geom_text(aes(label = round(NormalizedFreq, 1))) +
+    scale_fill_gradient(low = "white", 
+                        high = "red")  + 
+    labs(x = "Secondary Use", y = "Damage Type", title = "Secondary Use Heatmap -- Normalized")
+ggsave("./visualizations/secondary_normalized_heatmap.svg", width = 16, height = 6, units = "in")
+
+ggplot(secondary.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = Freq)) + 
+    geom_text(aes(label = round(Freq, 1))) +
+    scale_fill_gradient(low = "white", 
+                        high = "red")  + 
+    labs(x = "Secondary Use", y = "Damage Type", title = "Secondary Use Heatmap -- Not Normalized")
+ggsave("./visualizations/secondary_heatmap.svg", width = 16, height = 6, units = "in")
 ```
 
 This seems promising if we want to reduce the number of features.
