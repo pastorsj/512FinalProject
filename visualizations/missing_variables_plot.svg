@@ -75,6 +75,7 @@
 <polyline points='583.22,544.27 583.22,23.34 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
 <polyline points='714.52,544.27 714.52,23.34 ' style='stroke-width: 1.07; stroke: #EBEBEB; stroke-linecap: butt;' />
 <rect x='451.91' y='510.57' width='0.00' height='0.013' style='stroke-width: 1.07; stroke: #484878; stroke-linecap: square; stroke-linejoin: miter; fill: #484878;' />
+<rect x='451.91' y='471.69' width='0.00' height='0.013' style='stroke-width: 1.07; stroke: #484878; stroke-linecap: square; stroke-linejoin: miter; fill: #484878;' />
 <rect x='451.91' y='445.78' width='0.00' height='0.013' style='stroke-width: 1.07; stroke: #484878; stroke-linecap: square; stroke-linejoin: miter; fill: #484878;' />
 <rect x='451.91' y='432.82' width='0.00' height='0.013' style='stroke-width: 1.07; stroke: #484878; stroke-linecap: square; stroke-linejoin: miter; fill: #484878;' />
 <rect x='451.91' y='419.86' width='0.00' height='0.013' style='stroke-width: 1.07; stroke: #484878; stroke-linecap: square; stroke-linejoin: miter; fill: #484878;' />
@@ -113,8 +114,8 @@
 <rect x='451.91' y='368.02' width='0.00' height='0.013' style='stroke-width: 1.07; stroke: #484878; stroke-linecap: square; stroke-linejoin: miter; fill: #484878;' />
 <rect x='451.91' y='264.36' width='0.00' height='0.013' style='stroke-width: 1.07; stroke: #484878; stroke-linecap: square; stroke-linejoin: miter; fill: #484878;' />
 <rect x='451.91' y='303.23' width='0.00' height='0.013' style='stroke-width: 1.07; stroke: #484878; stroke-linecap: square; stroke-linejoin: miter; fill: #484878;' />
-<rect x='451.91' y='471.69' width='0.00' height='0.013' style='stroke-width: 1.07; stroke: #484878; stroke-linecap: square; stroke-linejoin: miter; fill: #484878;' />
 <circle cx='451.91' cy='510.57' r='1.95' style='stroke-width: 0.71; stroke: #484878; fill: #484878;' />
+<circle cx='451.91' cy='471.70' r='1.95' style='stroke-width: 0.71; stroke: #484878; fill: #484878;' />
 <circle cx='451.91' cy='445.78' r='1.95' style='stroke-width: 0.71; stroke: #484878; fill: #484878;' />
 <circle cx='451.91' cy='432.82' r='1.95' style='stroke-width: 0.71; stroke: #484878; fill: #484878;' />
 <circle cx='451.91' cy='419.86' r='1.95' style='stroke-width: 0.71; stroke: #484878; fill: #484878;' />
@@ -153,7 +154,6 @@
 <circle cx='451.91' cy='368.03' r='1.95' style='stroke-width: 0.71; stroke: #484878; fill: #484878;' />
 <circle cx='451.91' cy='264.36' r='1.95' style='stroke-width: 0.71; stroke: #484878; fill: #484878;' />
 <circle cx='451.91' cy='303.24' r='1.95' style='stroke-width: 0.71; stroke: #484878; fill: #484878;' />
-<circle cx='451.91' cy='471.70' r='1.95' style='stroke-width: 0.71; stroke: #484878; fill: #484878;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 <text x='184.37' y='539.64' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: Arial;' textLength='14.69px' lengthAdjust='spacingAndGlyphs'>age</text>

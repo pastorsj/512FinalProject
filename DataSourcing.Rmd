@@ -91,7 +91,61 @@ training.df <- training.values.df %>%
     other_floor_type = as.factor(other_floor_type),
     position = as.factor(position),
     plan_configuration = as.factor(plan_configuration),
-    legal_ownership_status = as.factor(legal_ownership_status),
+    legal_ownership_status = as.factor(legal_ownership_status)
+  )
+training.df <- training.df[c(1, 40, 2:39)]
+
+str(training.df)
+head(training.df)
+
+write.csv(training.df, './cleaned_data/cleaned_training_data.csv', row.names = FALSE)
+
+training.numeric.df <- training.df %>% 
+  mutate(land_surface_condition_n = ifelse(land_surface_condition == 'n', 1, 0),
+         land_surface_condition_o = ifelse(land_surface_condition == 'o', 1, 0),
+         land_surface_condition_t = ifelse(land_surface_condition == 't', 1, 0),
+         foundation_type_h = ifelse(foundation_type == 'h', 1, 0),
+         foundation_type_i = ifelse(foundation_type == 'i', 1, 0),
+         foundation_type_r = ifelse(foundation_type == 'r', 1, 0),
+         foundation_type_u = ifelse(foundation_type == 'u', 1, 0),
+         foundation_type_w = ifelse(foundation_type == 'w', 1, 0),
+         roof_type_n = ifelse(roof_type == 'n', 1, 0),
+         roof_type_q = ifelse(roof_type == 'q', 1, 0),
+         roof_type_x = ifelse(roof_type == 'x', 1, 0),
+         ground_floor_type_f = ifelse(ground_floor_type == 'f', 1, 0),
+         ground_floor_type_m = ifelse(ground_floor_type == 'm', 1, 0),
+         ground_floor_type_v = ifelse(ground_floor_type == 'v', 1, 0),
+         ground_floor_type_x = ifelse(ground_floor_type == 'x', 1, 0),
+         ground_floor_type_z = ifelse(ground_floor_type == 'z', 1, 0),
+         other_floor_type_j = ifelse(other_floor_type == 'j', 1, 0),
+         other_floor_type_q = ifelse(other_floor_type == 'q', 1, 0),
+         other_floor_type_s = ifelse(other_floor_type == 's', 1, 0),
+         other_floor_type_x = ifelse(other_floor_type == 'x', 1, 0),
+         position_j = ifelse(position == 'j', 1, 0),
+         position_o = ifelse(position == 'o', 1, 0),
+         position_s = ifelse(position == 's', 1, 0),
+         position_t = ifelse(position == 't', 1, 0),
+         plan_configuration_a = ifelse(plan_configuration == 'a', 1, 0),
+         plan_configuration_c = ifelse(plan_configuration == 'c', 1, 0),
+         plan_configuration_d = ifelse(plan_configuration == 'd', 1, 0),
+         plan_configuration_f = ifelse(plan_configuration == 'f', 1, 0),
+         plan_configuration_m = ifelse(plan_configuration == 'm', 1, 0),
+         plan_configuration_n = ifelse(plan_configuration == 'n', 1, 0),
+         plan_configuration_o = ifelse(plan_configuration == 'o', 1, 0),
+         plan_configuration_q = ifelse(plan_configuration == 'q', 1, 0),
+         plan_configuration_s = ifelse(plan_configuration == 's', 1, 0),
+         plan_configuration_u = ifelse(plan_configuration == 'u', 1, 0),
+         legal_ownership_status_a = ifelse(legal_ownership_status == 'a', 1, 0),
+         legal_ownership_status_r = ifelse(legal_ownership_status == 'r', 1, 0),
+         legal_ownership_status_v = ifelse(legal_ownership_status == 'v', 1, 0),
+         legal_ownership_status_w = ifelse(legal_ownership_status == 'w', 1, 0)) %>%
+  select(-land_surface_condition, -foundation_type, -roof_type, -ground_floor_type, -other_floor_type, -position, -plan_configuration, -legal_ownership_status)
+  
+str(training.numeric.df)
+write.csv(training.numeric.df, './cleaned_data/cleaned_numeric_training_data.csv', row.names = FALSE)
+
+training.df <- training.df %>%
+  mutate(
     has_secondary_use = as.factor(has_secondary_use),
     has_secondary_use_agriculture = as.factor(has_secondary_use_agriculture),
     has_secondary_use_hotel = as.factor(has_secondary_use_hotel),
@@ -113,11 +167,7 @@ training.df <- training.values.df %>%
     has_superstructure_bamboo = as.factor(has_superstructure_bamboo),
     has_superstructure_rc_non_engineered = as.factor(has_superstructure_rc_non_engineered),
     has_superstructure_rc_engineered = as.factor(has_superstructure_rc_engineered),
-    has_superstructure_other = as.factor(has_superstructure_other)
-  )
-
-str(training.df)
-head(training.df)
+    has_superstructure_other = as.factor(has_superstructure_other))
 ```
 
 # Initial Data Exploration
@@ -240,12 +290,6 @@ ggsave("./visualizations/labels_distribution.svg", width = 10, height = 8, units
 # GGally::ggpairs(training.df[,17:26], 
 #                 aes(color = training.df$damage_grade, alpha = 0.5), 
 #                 title = 'Correlogram of Superstructure Data') 
-```
-
-# Save the training data
-
-```{r}
-write.csv(training.df, './cleaned_data/cleaned_training_data.csv', row.names = FALSE)
 ```
 
 # Check the categorical variables compared to damage grade
