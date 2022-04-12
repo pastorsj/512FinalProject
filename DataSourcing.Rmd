@@ -230,16 +230,16 @@ ggsave("./visualizations/labels_distribution.svg", width = 10, height = 8, units
 ## Plot Correlation Matrices
 
 ```{r fig.height=8, fig.width=10}
-GGally::ggpairs(training.df[,2:6], 
-                aes(color = training.df$damage_grade, alpha = 0.5), 
-                title = 'Correlogram of Data') 
+# GGally::ggpairs(training.df[,2:6], 
+#                 aes(color = training.df$damage_grade, alpha = 0.5), 
+#                 title = 'Correlogram of Data') 
 ```
 
 
 ```{r fig.height=8, fig.width=10}
-GGally::ggpairs(training.df[,17:26], 
-                aes(color = training.df$damage_grade, alpha = 0.5), 
-                title = 'Correlogram of Superstructure Data') 
+# GGally::ggpairs(training.df[,17:26], 
+#                 aes(color = training.df$damage_grade, alpha = 0.5), 
+#                 title = 'Correlogram of Superstructure Data') 
 ```
 
 # Save the training data
@@ -248,9 +248,162 @@ GGally::ggpairs(training.df[,17:26],
 write.csv(training.df, './cleaned_data/cleaned_training_data.csv', row.names = FALSE)
 ```
 
+# Check the categorical variables compared to damage grade
+
+## Land Surface Condition
+
+```{r}
+land.heatmap.df <- as.data.frame(table(training.df$land_surface_condition, training.df$damage_grade))
+
+ggplot(land.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = Freq)) + 
+    geom_text(aes(label = round(Freq, 1))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Land Surface Condition", y = "Damage Type")
+ggsave("./visualizations/land_surface_condition_heatmap.svg", width = 10, height = 8, units = "in")
+```
+
+## Foundation Type
+
+```{r}
+foundation.heatmap.df <- as.data.frame(table(training.df$foundation_type, training.df$damage_grade))
+
+ggplot(foundation.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = Freq)) + 
+    geom_text(aes(label = round(Freq, 1))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Foundation Type", y = "Damage Type")
+ggsave("./visualizations/foundation_type_heatmap.svg", width = 10, height = 8, units = "in")
+```
+
+## Roof Type
+
+```{r}
+roof.heatmap.df <- as.data.frame(table(training.df$roof_type, training.df$damage_grade))
+
+ggplot(roof.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = Freq)) + 
+    geom_text(aes(label = round(Freq, 1))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Roof Type", y = "Damage Type")
+ggsave("./visualizations/roof_type_heatmap.svg", width = 10, height = 8, units = "in")
+```
+
+## Ground Floor Type
+
+```{r}
+ground.heatmap.df <- as.data.frame(table(training.df$ground_floor_type, training.df$damage_grade))
+
+ggplot(ground.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = Freq)) + 
+    geom_text(aes(label = round(Freq, 1))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Ground Type", y = "Damage Type")
+ggsave("./visualizations/ground_floor_type_heatmap.svg", width = 10, height = 8, units = "in")
+```
+
+## Other Floor Type
+
+```{r}
+other.heatmap.df <- as.data.frame(table(training.df$other_floor_type, training.df$damage_grade))
+
+ggplot(other.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = Freq)) + 
+    geom_text(aes(label = round(Freq, 1))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Other Type", y = "Damage Type")
+ggsave("./visualizations/other_floor_type_heatmap.svg", width = 10, height = 8, units = "in")
+```
+
+## Plan Configuration
+
+```{r}
+plan.heatmap.df <- as.data.frame(table(training.df$plan_configuration, training.df$damage_grade))
+
+ggplot(plan.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = Freq)) + 
+    geom_text(aes(label = round(Freq, 1))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Plan Configuration", y = "Damage Type")
+ggsave("./visualizations/plan_configuration_heatmap.svg", width = 10, height = 8, units = "in")
+```
+
+## Legal Ownership Status
+
+```{r}
+legal.heatmap.df <- as.data.frame(table(training.df$legal_ownership_status, training.df$damage_grade))
+
+ggplot(legal.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = Freq)) + 
+    geom_text(aes(label = round(Freq, 1))) +
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Legal Ownership Status", y = "Damage Type")
+ggsave("./visualizations/legal_ownership_status_heatmap.svg", width = 10, height = 8, units = "in")
+```
+
 # Outlier Checking
 
 What is going on with the Age? 995 for age?
 ```{r}
 table(training.df$age)
+
+age.heatmap.df <- as.data.frame(table(training.df$age, training.df$damage_grade))
+
+ggplot(age.heatmap.df, aes(Var1, Var2)) +
+    geom_tile(aes(fill = Freq)) + 
+    scale_fill_gradient(low = "white", high = "red")  + 
+    labs(x = "Age", y = "Damage Type")
+ggsave("./visualizations/age_heatmap.svg", width = 16, height = 6, units = "in")
 ```
+
+# Feature Engineering
+
+### Feature Engineering (Secondary Variables)
+
+Checking to see if we can combine secondary use data into one variable
+
+```{r}
+secondary.df <- training.df %>%
+  mutate(secondary_use = ifelse(has_secondary_use_agriculture == 1, "agriculture", "")) %>%
+  mutate(secondary_use = ifelse(has_secondary_use_hotel == 1, paste(secondary_use, "hotel", sep = " "), secondary_use)) %>%
+  mutate(secondary_use = ifelse(has_secondary_use_rental == 1, paste(secondary_use, "rental", sep = " "), secondary_use)) %>%
+  mutate(secondary_use = ifelse(has_secondary_use_institution == 1, paste(secondary_use, "institution", sep = " "), secondary_use)) %>%
+  mutate(secondary_use = ifelse(has_secondary_use_school == 1, paste(secondary_use, "school", sep = " "), secondary_use)) %>%
+  mutate(secondary_use = ifelse(has_secondary_use_industry == 1, paste(secondary_use, "industry", sep = " "), secondary_use)) %>%
+  mutate(secondary_use = ifelse(has_secondary_use_health_post == 1, paste(secondary_use, "health_post", sep = " "), secondary_use)) %>%
+  mutate(secondary_use = ifelse(has_secondary_use_gov_office == 1, paste(secondary_use, "gov_office", sep = " "), secondary_use)) %>%
+  mutate(secondary_use = ifelse(has_secondary_use_use_police == 1, paste(secondary_use, "use_police", sep = " "), secondary_use)) %>%
+  mutate(secondary_use = ifelse(has_secondary_use_other == 1, paste(secondary_use, "other", sep = " "), secondary_use)) %>%
+  mutate(secondary_use = str_trim(secondary_use)) %>%
+  mutate(secondary_use = ifelse(secondary_use == "", "none", secondary_use))
+
+table(secondary.df$secondary_use)
+table(secondary.df$secondary_use, secondary.df$damage_grade)
+```
+
+This seems promising if we want to reduce the number of features.
+
+### Feature Engineering (Superstructure Variables)
+
+Checking to see if we can/want to combine superstructure data into one variable
+
+```{r}
+superstructure.df <- training.df %>%
+    mutate(superstructure_material = ifelse(has_superstructure_adobe_mud == 1, "adobe_mud", "")) %>%
+    mutate(superstructure_material = ifelse(has_superstructure_mud_mortar_stone == 1, paste(superstructure_material, "mud_mortar_stone", sep = " "), superstructure_material)) %>%
+    mutate(superstructure_material = ifelse(has_superstructure_stone_flag == 1, paste(superstructure_material, "stone_flag", sep = " "), superstructure_material)) %>%
+    mutate(superstructure_material = ifelse(has_superstructure_cement_mortar_stone == 1, paste(superstructure_material, "cement_mortar_stone", sep = " "), superstructure_material)) %>%
+    mutate(superstructure_material = ifelse(has_superstructure_mud_mortar_brick == 1, paste(superstructure_material, "mud_mortar_brick", sep = " "), superstructure_material)) %>%
+    mutate(superstructure_material = ifelse(has_superstructure_cement_mortar_brick == 1, paste(superstructure_material, "cement_mortar_brick", sep = " "), superstructure_material)) %>%
+    mutate(superstructure_material = ifelse(has_superstructure_timber == 1, paste(superstructure_material, "timber", sep = " "), superstructure_material)) %>%
+    mutate(superstructure_material = ifelse(has_superstructure_bamboo == 1, paste(superstructure_material, "bamboo", sep = " "), superstructure_material)) %>%
+    mutate(superstructure_material = ifelse(has_superstructure_rc_non_engineered == 1, paste(superstructure_material, "rc_non_engineered", sep = " "), superstructure_material)) %>%
+    mutate(superstructure_material = ifelse(has_superstructure_rc_engineered == 1, paste(superstructure_material, "rc_engineered", sep = " "), superstructure_material)) %>%
+    mutate(superstructure_material = ifelse(has_superstructure_other == 1, paste(superstructure_material, "other", sep = " "), superstructure_material)) %>%
+    mutate(superstructure_material = str_trim(superstructure_material)) %>%
+    mutate(superstructure_material = ifelse(superstructure_material == "", "unknown", superstructure_material))
+
+table(superstructure.df$superstructure_material)
+```
+
+This seems less promising as the variables are not independent of each other
