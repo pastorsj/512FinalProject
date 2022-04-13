@@ -3,13 +3,18 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import ConfusionMatrixDisplay
+from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
 import matplotlib.pyplot as plt
 
 # importing machine learning models for prediction
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from xgboost import XGBClassifier
 from sklearn.svm import SVC, LinearSVC
 
@@ -38,6 +43,28 @@ def main():
     print('--------------Test Set Labels--------------\n', y_test)
     print('--------------Validation Set Labels--------------\n', y_val)
 
+    pipelines = [make_pipeline(StandardScaler(), LogisticRegression()),
+                 make_pipeline(StandardScaler(), GaussianNB()),
+                 make_pipeline(StandardScaler(), DecisionTreeClassifier()),
+                 make_pipeline(StandardScaler(), RandomForestClassifier()),
+                 make_pipeline(StandardScaler(), AdaBoostClassifier()),
+                 make_pipeline(StandardScaler(), QuadraticDiscriminantAnalysis()),
+                 make_pipeline(StandardScaler(), SVC(gamma=2, C=1)),
+                 make_pipeline(StandardScaler(), MLPClassifier(max_iter=1000))]
+
+    classifier_types = ['Logistic Regression',
+                        'Naive Bayes',
+                        'Decision Tree',
+                        'Random Forest',
+                        'AdaBoost',
+                        'Quadratic Discriminant Analysis',
+                        'Support Vector Machine',
+                        'Neural Network']
+
+    # run_random_forest(X_train, X_test, y_train, y_test)
+    run_all_classifiers(X_train, y_train, pipelines, classifier_types)
+
+def run_random_forest(X_train, X_test, y_train, y_test):
     # Run random forest
     print('Running random forest classifier')
     rf = RandomForestClassifier()
@@ -54,6 +81,18 @@ def main():
     plt.show()
     print('Calculating f1 score')
     print(f1_score(y_test, rf_pred, average='micro'))
+
+
+def run_all_classifiers(X_train, y_train, classifiers, classifier_types):
+    for clf, label in zip(classifiers, classifier_types):
+        print('Running cross validation for', label)
+        scores = cross_val_score(clf,
+                                 X_train,
+                                 y_train,
+                                 cv=5,
+                                 scoring='accuracy',
+                                 verbose=1)
+        print('Accuracy: %0.2f (+/- %0.2f) [%s]' % (scores.mean(), scores.std(), label))
 
 
 if __name__ == '__main__':
