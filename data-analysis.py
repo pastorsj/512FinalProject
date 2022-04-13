@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, BaggingClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from xgboost import XGBClassifier
@@ -48,6 +48,7 @@ def main():
                  make_pipeline(StandardScaler(), DecisionTreeClassifier()),
                  make_pipeline(StandardScaler(), RandomForestClassifier()),
                  make_pipeline(StandardScaler(), AdaBoostClassifier()),
+                 make_pipeline(StandardScaler(), BaggingClassifier()),
                  make_pipeline(StandardScaler(), QuadraticDiscriminantAnalysis()),
                  make_pipeline(StandardScaler(), SVC(gamma=2, C=1)),
                  make_pipeline(StandardScaler(), MLPClassifier(max_iter=1000))]
@@ -57,6 +58,7 @@ def main():
                         'Decision Tree',
                         'Random Forest',
                         'AdaBoost',
+                        'Bagging',
                         'Quadratic Discriminant Analysis',
                         'Support Vector Machine',
                         'Neural Network']
