@@ -47,7 +47,7 @@ library(readr)
 library(reticulate)
 library(tidyverse)
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load("weights", "interactions", "cjoint", "plm", "interactions", "jtools", "stats", "miceadds", "broom", "RColorBrewer", "ggstatsplot", "ggpubr", "stargazer", "sandwich", "hrbrthemes", "rms", "interplot", "coefplot", "gmodels", "car", "lattice", "foreign", "ggplot2", "MASS", "Hmisc", "reshape2", "oddsratio", "tidyr", "psych", "dplyr", "tidyverse", "cjoint", "naniar")
+pacman::p_load("weights", "interactions", "cjoint", "plm", "interactions", "jtools", "stats", "miceadds", "broom", "RColorBrewer", "ggstatsplot", "ggpubr", "stargazer", "sandwich", "hrbrthemes", "rms", "interplot", "coefplot", "gmodels", "car", "lattice", "foreign", "ggplot2", "MASS", "Hmisc", "reshape2", "oddsratio", "tidyr", "psych", "dplyr", "tidyverse", "cjoint", "naniar", "scales")
 
 knitr::opts_chunk$set(tidy.opts = list(width.cutoff = 60), tidy = TRUE, echo = TRUE)
 
@@ -56,6 +56,40 @@ knitr::knit_hooks$set(chunk = function(x, options) {
   x <- def.chunk.hook(x, options)
   ifelse(options$size != "normalsize", paste0("\n \\", options$size, "\n\n", x, "\n\n \\normalsize"), x)
 })
+
+theme_earth <- function() {
+  theme() %+replace%
+    
+    theme(
+      panel.background = element_rect(fill = "white",
+                                      colour = "white"),
+      plot.title = element_text(
+        size = 18,
+        face = "bold",
+        hjust = 0.5,
+        #vjust = 2
+      ),
+      plot.subtitle = element_text(
+        size = 12,
+        hjust = 0.5,
+      ),
+      plot.caption = element_text(
+        size = 10,
+        hjust = 0.5
+      ),
+      axis.title = element_text(
+        face = "bold",
+        size = 14,
+        hjust = 0.5
+      ),
+      axis.text = element_text(
+        size = 12
+      ),
+      strip.text.x = element_text(
+        size = 13
+      )
+    )
+}
 ```
 
 # Data Sourcing
@@ -234,6 +268,7 @@ Using a simple missing values chart, we can see how many values are actually mis
 gg_miss_var(training.df %>% mutate_all(na_if, ""), show_pct = TRUE) +
   ggtitle('Missing Values Plot')
 ggsave("./visualizations/missing_variables_plot.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/missing_variables_plot.png", width = 10, height = 8, units = "in")
 ```
 
 Given the missing values chart above, there are no missing values across all of the variables.
@@ -255,8 +290,11 @@ training.df %>%
   pivot_longer(names_to = 'Category', values_to = 'Value', cols = everything()) %>% 
   ggplot(aes(x = Value)) + 
   geom_bar(stat = 'count') + 
-  facet_wrap(~Category, scales = 'free')
-ggsave("./visualizations/categorical_variables_distribution.svg", width = 10, height = 8, units = "in")
+  facet_wrap(~Category, scales = 'free') +
+  labs(x = 'Variable', y = 'Count', title = 'Distribution of Categorial Variables') + 
+  theme_earth()
+ggsave("./visualizations/categorical_variables_distribution.svg", width = 10, height = 6, units = "in")
+ggsave("./visualizations/categorical_variables_distribution.png", width = 10, height = 6, units = "in")
 ```
 
 ### Numerical Distribution
@@ -268,8 +306,11 @@ training.df %>%
   pivot_longer(names_to = "Variable", values_to = "value", cols = everything()) %>%
   ggplot(aes(x = value)) +
   geom_histogram() +
-  facet_wrap(~Variable, scales = "free")
-ggsave("./visualizations/numerical_variables_distribution.svg", width = 10, height = 8, units = "in")
+  facet_wrap(~Variable, scales = "free") +
+  labs(x = 'Variable', y = 'Count', title = 'Distribution of Numerical Variables') + 
+  theme_earth()
+ggsave("./visualizations/numerical_variables_distribution.svg", width = 10, height = 6, units = "in")
+ggsave("./visualizations/numerical_variables_distribution.png", width = 10, height = 6, units = "in")
 ```
 
 ### Superstructure information
@@ -288,11 +329,45 @@ training.df %>%
          has_superstructure_rc_engineered,
          has_superstructure_other) %>%
   pivot_longer(names_to = "Category", values_to = "Value", cols = everything()) %>%
+  mutate(Category = str_replace(Category, 'has_superstructure_', '')) %>%
   ggplot(aes(x = Value, fill = Value)) +
   geom_bar(stat = "count") +
-  geom_text(aes(label = ..count..), stat = "count", vjust = 1, nudge_y = -.5) +
-  facet_wrap(~Category, scales = "free")
-ggsave("./visualizations/superstructure_variables_distribution.svg", width = 14, height = 8, units = "in")
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1) +
+  facet_wrap(~Category, scales = "free") +
+  labs(x = 'Value', y = 'Count', title = 'Distribution of Superstructure Variables') + 
+  theme_earth()
+ggsave("./visualizations/superstructure_variables_distribution.svg", width = 14, height = 6, units = "in")
+ggsave("./visualizations/superstructure_variables_distribution.png", width = 14, height = 6, units = "in")
+```
+
+Visualizing superstructure variable vs damage grade
+```{r fig.height=8, fig.width=10}
+training.df %>%
+  select(has_superstructure_cement_mortar_brick, 
+         has_superstructure_adobe_mud, 
+         has_superstructure_mud_mortar_stone, 
+         has_superstructure_stone_flag, 
+         has_superstructure_cement_mortar_stone, 
+         has_superstructure_mud_mortar_brick, 
+         has_superstructure_cement_mortar_brick, 
+         has_superstructure_timber, 
+         has_superstructure_bamboo, 
+         has_superstructure_rc_non_engineered, 
+         has_superstructure_rc_engineered,
+         has_superstructure_other,
+         damage_grade) %>%
+  pivot_longer(names_to = "Category", values_to = "Value", cols = c(-damage_grade)) %>%
+  mutate(Category = str_replace(Category, 'has_superstructure_', '')) %>%
+  filter(Value == 1) %>%
+  ggplot(aes(x = damage_grade, fill = damage_grade)) +
+  geom_bar(stat = "count") +
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1, nudge_y = -.5) + 
+  facet_wrap(~Category, scales = "free") +
+  labs(x = 'Damage Grade', y = 'Count', title = 'Superstructure Type vs Damage Sustained', subtitle = 'Only when a building has a superstructure type') + 
+  guides(fill = guide_legend(title = "Damage Grade")) + 
+  theme_earth()
+ggsave("./visualizations/superstructure_damage_comparison.svg", width = 14, height = 6, units = "in")
+ggsave("./visualizations/superstructure_damage_comparison.png", width = 14, height = 6, units = "in")
 ```
 
 
@@ -301,7 +376,6 @@ ggsave("./visualizations/superstructure_variables_distribution.svg", width = 14,
 ```{r fig.height=8, fig.width=10}
 training.df %>%
   select(
-    has_secondary_use,
     has_secondary_use_agriculture,
     has_secondary_use_hotel,
     has_secondary_use_rental,
@@ -314,11 +388,43 @@ training.df %>%
     has_secondary_use_other
   ) %>%
   pivot_longer(names_to = "Category", values_to = "Value", cols = everything()) %>%
+  mutate(Category = str_replace(Category, 'has_secondary_use_', '')) %>%
   ggplot(aes(x = Value, fill = Value)) +
   geom_bar(stat = "count") +
-  geom_text(aes(label = ..count..), stat = "count", vjust = 1, nudge_y = -.5) +
-  facet_wrap(~Category, scales = "free")
-ggsave("./visualizations/secondary_variables_distribution.svg", width = 12, height = 8, units = "in")
+  geom_text(aes(label = ..count..), stat = "count") +
+  facet_wrap(~Category, scales = "free") +
+  labs(x = 'Value', y = 'Count', title = 'Distribution of Secondary Use Variables') + 
+  theme_earth()
+ggsave("./visualizations/secondary_variables_distribution.svg", width = 12, height = 6, units = "in")
+ggsave("./visualizations/secondary_variables_distribution.png", width = 12, height = 6, units = "in")
+```
+
+Plot secondary usage vs damage grade
+```{r}
+training.df %>%
+  select(has_secondary_use_agriculture,
+         has_secondary_use_hotel,
+         has_secondary_use_rental,
+         has_secondary_use_institution,
+         has_secondary_use_school,
+         has_secondary_use_industry,
+         has_secondary_use_health_post,
+         has_secondary_use_gov_office,
+         has_secondary_use_use_police,
+         has_secondary_use_other,
+         damage_grade) %>%
+  pivot_longer(names_to = "Category", values_to = "Value", cols = c(-damage_grade)) %>%
+  mutate(Category = str_replace(Category, 'has_secondary_use_', '')) %>%
+  filter(Value == 1) %>%
+  ggplot(aes(x = damage_grade, fill = damage_grade)) +
+  geom_bar(stat = "count") +
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1, nudge_y = -.5) + 
+  facet_wrap(~Category, scales = "free") +
+  labs(x = 'Damage Grade', y = 'Count', title = 'Secondary Use vs Damage Sustained', subtitle = 'Only when a building has a secondary use') + 
+  guides(fill = guide_legend(title = "Damage Grade")) + 
+  theme_earth()
+ggsave("./visualizations/secondary_use_damage_comparison.svg", width = 14, height = 6, units = "in")
+ggsave("./visualizations/secondary_use_damage_comparison.png", width = 14, height = 6, units = "in")
 ```
 
 Plot damage grade label information
@@ -329,8 +435,11 @@ training.df %>%
   geom_bar() + 
   geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, nudge_y = -.5) +
   guides(color = guide_legend('Damage Grade')) + 
-  labs(x = 'Damage Grade Labels', y = 'Count', title = 'Distribution of Damage Grade Labels')
-ggsave("./visualizations/labels_distribution.svg", width = 10, height = 8, units = "in")
+  labs(x = 'Damage Grade', y = 'Count', title = 'Distribution of Damage Grades') + 
+  guides(fill = guide_legend(title = "Damage Grade")) + 
+  theme_earth()
+ggsave("./visualizations/labels_distribution.svg", width = 10, height = 6, units = "in")
+ggsave("./visualizations/labels_distribution.png", width = 10, height = 6, units = "in")
 ```
 
 ## Plot Correlation Matrices
@@ -364,15 +473,19 @@ ggplot(land.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = NormalizedFreq)) + 
     geom_text(aes(label = paste0(NormalizedFreq, '%'))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Land Surface Condition", y = "Damage Type", title = "Land Surface Condition Heatmap -- Normalized")
+    labs(x = "Land Surface Condition", y = "Damage Type", title = "Land Surface Condition Heatmap -- Normalized") + 
+    theme_earth()
 ggsave("./visualizations/land_surface_condition_normalized_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/land_surface_condition_normalized_heatmap.png", width = 10, height = 8, units = "in")
 
 ggplot(land.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Land Surface Condition", y = "Damage Type", title = "Land Surface Condition Heatmap -- Not Normalized")
+    labs(x = "Land Surface Condition", y = "Damage Type", title = "Land Surface Condition Heatmap -- Not Normalized") + 
+    theme_earth()
 ggsave("./visualizations/land_surface_condition_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/land_surface_condition_heatmap.png", width = 10, height = 8, units = "in")
 ```
 
 ## Foundation Type
@@ -389,15 +502,19 @@ ggplot(foundation.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = NormalizedFreq)) + 
     geom_text(aes(label = paste0(NormalizedFreq, '%'))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Foundation Type", y = "Damage Type", title = "Foundation Type Heatmap -- Normalized")
+    labs(x = "Foundation Type", y = "Damage Type", title = "Foundation Type Heatmap -- Normalized") + 
+    theme_earth()
 ggsave("./visualizations/foundation_type_normalized_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/foundation_type_normalized_heatmap.png", width = 10, height = 8, units = "in")
 
 ggplot(foundation.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Foundation Type", y = "Damage Type", title = "Foundation Type Heatmap -- Not Normalized")
+    labs(x = "Foundation Type", y = "Damage Type", title = "Foundation Type Heatmap -- Not Normalized") + 
+    theme_earth()
 ggsave("./visualizations/foundation_type_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/foundation_type_heatmap.png", width = 10, height = 8, units = "in")
 ```
 
 ## Roof Type
@@ -414,15 +531,19 @@ ggplot(roof.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = NormalizedFreq)) + 
     geom_text(aes(label = paste0(NormalizedFreq, "%"))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Roof Type", y = "Damage Type", title = "Roof Type Heatmap -- Normalized")
+    labs(x = "Roof Type", y = "Damage Type", title = "Roof Type Heatmap -- Normalized") + 
+    theme_earth()
 ggsave("./visualizations/roof_type_normalized_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/roof_type_normalized_heatmap.png", width = 10, height = 8, units = "in")
 
 ggplot(roof.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Roof Type", y = "Damage Type", title = "Roof Type Heatmap -- Not Normalized")
+    labs(x = "Roof Type", y = "Damage Type", title = "Roof Type Heatmap -- Not Normalized") + 
+    theme_earth()
 ggsave("./visualizations/roof_type_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/roof_type_heatmap.png", width = 10, height = 8, units = "in")
 ```
 
 ## Ground Floor Type
@@ -441,6 +562,7 @@ ggplot(ground.heatmap.df, aes(Var1, Var2)) +
     scale_fill_gradient(low = "white", high = "red")  + 
     labs(x = "Ground Type", y = "Damage Type", title = "Ground Floor Type Heatmap -- Normalized")
 ggsave("./visualizations/ground_floor_type_normalized_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/ground_floor_type_normalized_heatmap.png", width = 10, height = 8, units = "in")
 
 ggplot(ground.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
@@ -448,6 +570,7 @@ ggplot(ground.heatmap.df, aes(Var1, Var2)) +
     scale_fill_gradient(low = "white", high = "red")  + 
     labs(x = "Ground Type", y = "Damage Type", title = "Ground Floor Type Heatmap -- Not Normalized")
 ggsave("./visualizations/ground_floor_type_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/ground_floor_type_heatmap.png", width = 10, height = 8, units = "in")
 ```
 
 ## Other Floor Type
@@ -464,15 +587,19 @@ ggplot(other.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = NormalizedFreq)) + 
     geom_text(aes(label = paste0(NormalizedFreq, "%"))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Other Floor Type", y = "Damage Type", title = "Other Floor Type Heatmap -- Normalized")
+    labs(x = "Other Floor Type", y = "Damage Type", title = "Other Floor Type Heatmap -- Normalized") + 
+    theme_earth()
 ggsave("./visualizations/other_floor_type_normalized_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/other_floor_type_normalized_heatmap.png", width = 10, height = 8, units = "in")
 
 ggplot(other.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Other Floor Type", y = "Damage Type", title = "Other Floor Type Heatmap -- Not Normalized")
+    labs(x = "Other Floor Type", y = "Damage Type", title = "Other Floor Type Heatmap -- Not Normalized") + 
+    theme_earth()
 ggsave("./visualizations/other_floor_type_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/other_floor_type_heatmap.png", width = 10, height = 8, units = "in")
 ```
 
 ## Plan Configuration
@@ -489,15 +616,19 @@ ggplot(plan.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = NormalizedFreq)) + 
     geom_text(aes(label = paste0(NormalizedFreq, "%"))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Plan Configuration", y = "Damage Type", title = "Plan Configuration Heatmap -- Normalized")
+    labs(x = "Plan Configuration", y = "Damage Type", title = "Plan Configuration Heatmap -- Normalized") + 
+    theme_earth()
 ggsave("./visualizations/plan_configuration_normalized_heatmap.svg", width = 12, height = 8, units = "in")
+ggsave("./visualizations/plan_configuration_normalized_heatmap.png", width = 12, height = 8, units = "in")
 
 ggplot(plan.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Plan Configuration", y = "Damage Type", title = "Plan Configuration Heatmap -- Not Normalized")
+    labs(x = "Plan Configuration", y = "Damage Type", title = "Plan Configuration Heatmap -- Not Normalized") + 
+    theme_earth()
 ggsave("./visualizations/plan_configuration_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/plan_configuration_heatmap.png", width = 10, height = 8, units = "in")
 ```
 
 ## Legal Ownership Status
@@ -514,15 +645,19 @@ ggplot(legal.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = NormalizedFreq)) + 
     geom_text(aes(label = paste0(NormalizedFreq, "%"))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Legal Ownership Status", y = "Damage Type", title = "Legal Ownership Status Heatmap -- Normalized")
+    labs(x = "Legal Ownership Status", y = "Damage Type", title = "Legal Ownership Status Heatmap -- Normalized") + 
+    theme_earth()
 ggsave("./visualizations/legal_ownership_status_normalized_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/legal_ownership_status_normalized_heatmap.png", width = 10, height = 8, units = "in")
 
 ggplot(legal.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Legal Ownership Status", y = "Damage Type", title = "Legal Ownership Status Heatmap -- Not Normalized")
+    labs(x = "Legal Ownership Status", y = "Damage Type", title = "Legal Ownership Status Heatmap -- Not Normalized") + 
+    theme_earth()
 ggsave("./visualizations/legal_ownership_status_heatmap.svg", width = 10, height = 8, units = "in")
+ggsave("./visualizations/legal_ownership_status_heatmap.png", width = 10, height = 8, units = "in")
 ```
 
 # Outlier Checking
@@ -541,14 +676,18 @@ age.heatmap.df <- as.data.frame(table(training.df$age, training.df$damage_grade)
 ggplot(age.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = NormalizedFreq)) + 
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Age", y = "Damage Type", title = "Age Heatmap -- Normalized")
+    labs(x = "Age", y = "Damage Type", title = "Age Heatmap -- Normalized") + 
+    theme_earth()
 ggsave("./visualizations/age_normalized_heatmap.svg", width = 16, height = 6, units = "in")
+ggsave("./visualizations/age_normalized_heatmap.png", width = 16, height = 6, units = "in")
 
 ggplot(age.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     scale_fill_gradient(low = "white", high = "red")  + 
-    labs(x = "Age", y = "Damage Type", title = "Age Heatmap -- Not Normalized")
+    labs(x = "Age", y = "Damage Type", title = "Age Heatmap -- Not Normalized") + 
+    theme_earth()
 ggsave("./visualizations/age_heatmap.svg", width = 16, height = 6, units = "in")
+ggsave("./visualizations/age_heatmap.png", width = 16, height = 6, units = "in")
 ```
 
 # Feature Engineering
@@ -588,16 +727,20 @@ ggplot(secondary.heatmap.df, aes(Var1, Var2)) +
     geom_text(aes(label = round(NormalizedFreq, 1))) +
     scale_fill_gradient(low = "white", 
                         high = "red")  + 
-    labs(x = "Secondary Use", y = "Damage Type", title = "Secondary Use Heatmap -- Normalized")
+    labs(x = "Secondary Use", y = "Damage Type", title = "Secondary Use Heatmap -- Normalized") + 
+    theme_earth()
 ggsave("./visualizations/secondary_normalized_heatmap.svg", width = 16, height = 6, units = "in")
+ggsave("./visualizations/secondary_normalized_heatmap.png", width = 16, height = 6, units = "in")
 
 ggplot(secondary.heatmap.df, aes(Var1, Var2)) +
     geom_tile(aes(fill = Freq)) + 
     geom_text(aes(label = round(Freq, 1))) +
     scale_fill_gradient(low = "white", 
                         high = "red")  + 
-    labs(x = "Secondary Use", y = "Damage Type", title = "Secondary Use Heatmap -- Not Normalized")
+    labs(x = "Secondary Use", y = "Damage Type", title = "Secondary Use Heatmap -- Not Normalized") + 
+    theme_earth()
 ggsave("./visualizations/secondary_heatmap.svg", width = 16, height = 6, units = "in")
+ggsave("./visualizations/secondary_heatmap.png", width = 16, height = 6, units = "in")
 ```
 
 This seems promising if we want to reduce the number of features.
